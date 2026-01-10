@@ -8,6 +8,13 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioSource sfxSource;
 
+    public string GetPrompt()
+    {
+        if (targetLight == null) return "E : Interact";
+        // enabled=true면 끄는 행동이 다음 행동
+        return targetLight.enabled ? "E : Lights Off" : "E : Lights On";
+    }
+
     public void Interact()
     {
         if (targetLight != null)

@@ -5,74 +5,93 @@ public class PlayerInteraction : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float range = 3f;
-    [SerializeField] private LayerMask interactMask; // Interactable 레이어만
+    [SerializeField] private LayerMask interactMask;
 
-    [Header("UI (Optional)")]
+    [Header("UI")]
     [SerializeField] private TMP_Text promptText;
-    [SerializeField] private string promptMessage = "E : Interact";
+    [SerializeField] private string fallbackPrompt = "E : Interact";
 
     private IInteractable currentTarget;
+    private string lastPrompt;
 
     private void Start()
     {
-        SetPrompt(false);
+        SetPrompt(null);
     }
 
     private void Update()
     {
-        UpdateTarget();
+        UpdateTargetAndPrompt();
 
         if (Input.GetKeyDown(KeyCode.E) && currentTarget != null)
         {
             currentTarget.Interact();
+
+            // 상호작용으로 상태가 바뀌면(문 열림/라이트 토글) 프롬프트도 즉시 갱신
+            SetPrompt(SafePrompt(currentTarget));
         }
     }
 
-    private void UpdateTarget()
+    private void UpdateTargetAndPrompt()
     {
         Ray ray = new Ray(transform.position, transform.forward);
 
         if (Physics.Raycast(ray, out RaycastHit hit, range, interactMask, QueryTriggerInteraction.Ignore))
         {
-            // 자식 collider 맞아도 부모에서 찾기
             var target = hit.collider.GetComponentInParent<IInteractable>();
-
             if (target != null)
             {
-                // 타겟이 바뀌었을 때만 갱신(불필요한 SetActive/텍스트 변경 방지)
-                if (!ReferenceEquals(currentTarget, target))
-                {
-                    currentTarget = target;
-                    SetPrompt(true);
-                }
+                currentTarget = target;
+                SetPrompt(SafePrompt(target)); // 매 프레임 갱신(상태 기반 프롬프트 대응)
                 return;
             }
         }
 
-        // 아무것도 못 맞추거나, 맞췄는데 interactable이 아니면
-        if (currentTarget != null)
-        {
-            currentTarget = null;
-            SetPrompt(false);
-        }
+        currentTarget = null;
+        SetPrompt(null);
     }
 
-    private void SetPrompt(bool visible)
+    private string SafePrompt(IInteractable target)
+    {
+        if (target == null) return null;
+
+        string p = null;
+        try
+        {
+            p = target.GetPrompt();
+        }
+        catch
+        {
+            // 인터페이스 구현 누락/예외 등 방어
+            p = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(p))
+            p = fallbackPrompt;
+
+        return p;
+    }
+
+    private void SetPrompt(string message)
     {
         if (promptText == null) return;
 
-        if (visible)
-        {
-            if (!promptText.gameObject.activeSelf)
-                promptText.gameObject.SetActive(true);
-
-            if (promptText.text != promptMessage)
-                promptText.text = promptMessage;
-        }
-        else
+        if (string.IsNullOrEmpty(message))
         {
             if (promptText.gameObject.activeSelf)
                 promptText.gameObject.SetActive(false);
+
+            lastPrompt = null;
+            return;
+        }
+
+        if (!promptText.gameObject.activeSelf)
+            promptText.gameObject.SetActive(true);
+
+        if (lastPrompt != message)
+        {
+            promptText.text = message;
+            lastPrompt = message;
         }
     }
 }
