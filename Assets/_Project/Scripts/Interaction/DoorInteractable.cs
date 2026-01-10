@@ -15,6 +15,12 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     private Quaternion closedRot;
     private Quaternion openRot;
 
+    public string GetPrompt()
+    {
+        // 현재 상태 기준으로 "다음 행동"을 표시
+        return isOpen ? "E : Close" : "E : Open";
+    }
+
     private void Awake()
     {
         closedRot = transform.rotation;
