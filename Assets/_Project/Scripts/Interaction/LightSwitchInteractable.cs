@@ -11,6 +11,10 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable
     [Header("One-shot Event (Optional)")]
     [SerializeField] private LightFlickerEvent firstPowerOnEvent;
 
+    [Header("Unlock Targets (Optional)")]
+    [SerializeField] private DoorInteractable[] unlockDoorsOnFirstPowerOn;
+
+
     public string GetPrompt()
     {
         if (targetLight == null) return "E : Interact";
@@ -42,10 +46,21 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable
 
         EventFlags.Instance.firstPowerOnTriggered = true;
 
+        if (unlockDoorsOnFirstPowerOn != null)
+        {
+            foreach (var d in unlockDoorsOnFirstPowerOn)
+            {
+                if (d != null) d.Unlock();
+            }
+        }
+
         if (firstPowerOnEvent != null)
             firstPowerOnEvent.Play();
 
         Debug.Log("[Event] First power on triggered");
+
+
+
     }
 
 }

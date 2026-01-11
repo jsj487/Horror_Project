@@ -10,6 +10,12 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioSource sfxSource;
 
+    [Header("Lock")]
+    [SerializeField] private bool startLocked = true;
+    [SerializeField] private AudioSource sfxLocked; // 없어도 됨
+
+    private bool isLocked;
+
     private bool isOpen;
     private bool isMoving;
     private Quaternion closedRot;
@@ -18,6 +24,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     public string GetPrompt()
     {
         // 현재 상태 기준으로 "다음 행동"을 표시
+        if (isLocked) return "E : Locked";
         return isOpen ? "E : Close" : "E : Open";
     }
 
@@ -25,10 +32,27 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     {
         closedRot = transform.rotation;
         openRot = closedRot * Quaternion.Euler(0f, openAngle, 0f);
+        isLocked = startLocked;
+    }
+
+    public void Unlock()
+    {
+        isLocked = false;
+    }
+
+    public void Lock()
+    {
+        isLocked = true;
     }
 
     public void Interact()
     {
+        if (isLocked)
+        {
+            if (sfxLocked != null) sfxLocked.Play();
+            return;
+        }
+
         if (isMoving) return;
 
         isOpen = !isOpen;
