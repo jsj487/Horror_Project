@@ -8,6 +8,9 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioSource sfxSource;
 
+    [Header("One-shot Event (Optional)")]
+    [SerializeField] private LightFlickerEvent firstPowerOnEvent;
+
     public string GetPrompt()
     {
         if (targetLight == null) return "E : Interact";
@@ -18,9 +21,31 @@ public class LightSwitchInteractable : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (targetLight != null)
+        {
+            bool wasOn = targetLight.enabled;
             targetLight.enabled = !targetLight.enabled;
+
+            // OFF -> ON 되는 순간, 최초 1회 이벤트
+            if (!wasOn && targetLight.enabled)
+            {
+                TryTriggerFirstPowerOn();
+            }
+        }
 
         if (sfxSource != null)
             sfxSource.Play();
     }
+    private void TryTriggerFirstPowerOn()
+    {
+        if (EventFlags.Instance == null) return;
+        if (EventFlags.Instance.firstPowerOnTriggered) return;
+
+        EventFlags.Instance.firstPowerOnTriggered = true;
+
+        if (firstPowerOnEvent != null)
+            firstPowerOnEvent.Play();
+
+        Debug.Log("[Event] First power on triggered");
+    }
+
 }
