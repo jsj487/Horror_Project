@@ -6,6 +6,7 @@ public class EventFlags : MonoBehaviour
 
     [Header("Flags")]
     public bool firstPowerOnTriggered;
+    public bool keypadSolved;
 
     private void Awake()
     {
