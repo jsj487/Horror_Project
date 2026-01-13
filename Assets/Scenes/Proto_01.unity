@@ -435,7 +435,7 @@ MonoBehaviour:
   sfxSource: {fileID: 0}
   startLocked: 1
   sfxLocked: {fileID: 0}
-  startOpen: 1
+  startOpen: 0
 --- !u!4 &128140406
 Transform:
   m_ObjectHideFlags: 0
