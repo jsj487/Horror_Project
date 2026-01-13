@@ -11,6 +11,8 @@ public class OneShotTrigger : MonoBehaviour
     [SerializeField] private Light[] toggleLights;
     [SerializeField] private bool setLightsEnabled = false;
     [SerializeField] private bool targetEnabledState = false;
+    [SerializeField] private ObjectiveManager objectiveManager;
+    [SerializeField] private ObjectiveStep setObjectiveOnTrigger = ObjectiveStep.FindCodeAndUseKeypad;
 
     [SerializeField] private AudioSource stinger; // 없어도 됨
     [SerializeField] private float autoDisableAfterSeconds = 0f;
@@ -37,6 +39,9 @@ public class OneShotTrigger : MonoBehaviour
                 Fire();
             }
         }
+
+        if (objectiveManager != null)
+            objectiveManager.SetStep(setObjectiveOnTrigger);
     }
 
     private void Fire()

@@ -25,6 +25,10 @@ public class KeypadSolvedSequence : MonoBehaviour
     [SerializeField] private float preFocusTime = 0.6f;
     [SerializeField] private bool unlockCursorDuringFocus = false;
 
+    [Header("Objective (Optional)")]
+    [SerializeField] private ObjectiveManager objectiveManager;
+    [SerializeField] private ObjectiveStep setObjectiveOnTrigger = ObjectiveStep.FindCodeAndUseKeypad;
+
 
     private bool played;
 
@@ -72,6 +76,9 @@ public class KeypadSolvedSequence : MonoBehaviour
         }
 
         if (silhouetteRoot != null) silhouetteRoot.SetActive(false);
+
+        if (objectiveManager != null)
+            objectiveManager.SetStep(ObjectiveStep.RestorePower);
 
         SetControlLocked(false);
     }
