@@ -12,14 +12,17 @@ public class DoorInteractable : MonoBehaviour, IInteractable
 
     [Header("Lock")]
     [SerializeField] private bool startLocked = true;
-    [SerializeField] private AudioSource sfxLocked; // 없어도 됨
+    [SerializeField] private AudioSource sfxLocked;
+
+    [Header("Start State")]
+    [SerializeField] private bool startOpen = true; // 입구문에만 true로
 
     private bool isLocked;
 
     private bool isOpen;
     private bool isMoving;
-    private Quaternion closedRot;
-    private Quaternion openRot;
+    private Quaternion closedLocalRot;
+    private Quaternion openLocalRot;
 
     public string GetPrompt()
     {
@@ -30,8 +33,8 @@ public class DoorInteractable : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        closedRot = transform.rotation;
-        openRot = closedRot * Quaternion.Euler(0f, openAngle, 0f);
+        closedLocalRot = transform.localRotation;
+        openLocalRot = closedLocalRot * Quaternion.Euler(0f, openAngle, 0f);
         isLocked = startLocked;
     }
 
@@ -57,7 +60,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
 
         isOpen = !isOpen;
         StopAllCoroutines();
-        StartCoroutine(RotateDoor(isOpen ? openRot : closedRot));
+        StartCoroutine(RotateDoor(isOpen ? openLocalRot : closedLocalRot));
 
         if (sfxSource != null)
             sfxSource.Play();
@@ -66,17 +69,51 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     private IEnumerator RotateDoor(Quaternion target)
     {
         isMoving = true;
-        Quaternion start = transform.rotation;
+        Quaternion start = transform.localRotation;
         float t = 0f;
 
         while (t < 1f)
         {
             t += Time.deltaTime / Mathf.Max(0.01f, duration);
-            transform.rotation = Quaternion.Slerp(start, target, t);
+            transform.localRotation = Quaternion.Slerp(start, target, t);
             yield return null;
         }
 
-        transform.rotation = target;
+        transform.localRotation = target;
         isMoving = false;
     }
+
+    private void Start()
+    {
+        if (startOpen)
+        {
+            // 문이 "열린 상태"가 되도록 즉시 회전/상태 세팅
+            SetOpenImmediate(true);
+        }
+    }
+
+    public void SetOpenImmediate(bool open)
+    {
+        isOpen = open;
+        transform.localRotation = open ? openLocalRot : closedLocalRot;
+    }
+
+    public void Open()
+    {
+        if (isMoving) return;
+        isOpen = true;
+        StopAllCoroutines();
+        StartCoroutine(RotateDoor(openLocalRot));
+        if (sfxSource != null) sfxSource.Play();
+    }
+
+    public void Close()
+    {
+        if (isMoving) return;
+        isOpen = false;
+        StopAllCoroutines();
+        StartCoroutine(RotateDoor(closedLocalRot));
+        if (sfxSource != null) sfxSource.Play();
+    }
+
 }

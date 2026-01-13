@@ -22,6 +22,10 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
     [SerializeField] private MonoBehaviour moveScript; // FirstPersonMove 연결
     [SerializeField] private bool unlockCursor = true;
 
+    [Header("Solved Events (Optional)")]
+    [SerializeField] private GlimpseEvent glimpseEvent;
+    [SerializeField] private KeypadSolvedSequence onSolvedSequence;
+
     private bool isEntering;
     private string buffer = "";
 
@@ -130,9 +134,13 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
 
         if (sfxOk != null) sfxOk.Play();
 
+        if (onSolvedSequence != null) onSolvedSequence.Play();
+
         isEntering = false;
         SetInputLocked(false);
         HideUI();
+
+        if (glimpseEvent != null) glimpseEvent.Play();
 
         Debug.Log("[Keypad] Solved");
     }
