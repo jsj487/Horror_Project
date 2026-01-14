@@ -9,7 +9,7 @@ public class ObjectiveUI : MonoBehaviour
 
     private void Start()
     {
-        SetText("Objective: Restore power");
+        SetText("Objective: Enter the corridor");
     }
 
     private void Update()
