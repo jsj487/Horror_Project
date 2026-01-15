@@ -5,7 +5,8 @@ public class KeypadSolvedSequence : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private DoorInteractable entranceDoor; // 처음 들어온 Door_Hinge
-    [SerializeField] private GameObject silhouetteRoot;     // Silhouette_Entrance
+    [SerializeField] private SilhouetteController silhouette;
+    [SerializeField] private Transform silhouettePoint;
     [SerializeField] private AudioSource stinger;           // 선택
 
     [Header("Timing")]
@@ -43,7 +44,8 @@ public class KeypadSolvedSequence : MonoBehaviour
     {
         SetControlLocked(true);
 
-        if (silhouetteRoot != null) silhouetteRoot.SetActive(true);
+        if (silhouette != null)
+            silhouette.ShowAt(silhouettePoint, silhouetteDuration);
         if (stinger != null) stinger.Play();
 
         // 1) 먼저 시점 고정(문을 바라보게 만들기)
@@ -74,8 +76,6 @@ public class KeypadSolvedSequence : MonoBehaviour
             FocusStep();
             yield return null;
         }
-
-        if (silhouetteRoot != null) silhouetteRoot.SetActive(false);
 
         if (objectiveManager != null)
             objectiveManager.SetStep(ObjectiveStep.RestorePower);

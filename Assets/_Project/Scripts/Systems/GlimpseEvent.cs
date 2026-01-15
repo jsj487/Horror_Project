@@ -1,10 +1,10 @@
-using System.Collections;
 using UnityEngine;
 
 public class GlimpseEvent : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private GameObject silhouette;
+    [SerializeField] private SilhouetteController silhouette;
+    [SerializeField] private Transform silhouettePoint;
     [SerializeField] private AudioSource stinger;
     [SerializeField] private Light[] toggleLights;
 
@@ -18,10 +18,16 @@ public class GlimpseEvent : MonoBehaviour
 
     public void Play()
     {
+        Debug.Log("[GlimpseEvent] Play called");
+        Debug.Log($"[GlimpseEvent] Play called on {name}");
+        Debug.Log($"[GlimpseEvent] silhouette={(silhouette ? silhouette.name : "NULL")}, point={(silhouettePoint ? silhouettePoint.name : "NULL")}");
+
         if (oneShot && played) return;
         played = true;
 
-        if (silhouette != null) silhouette.SetActive(true);
+        if (silhouette != null)
+            silhouette.ShowAt(silhouettePoint, showDuration);
+
         if (stinger != null) stinger.Play();
 
         if (toggleLights != null && toggleLights.Length > 0)
@@ -33,14 +39,6 @@ public class GlimpseEvent : MonoBehaviour
                 else l.enabled = !l.enabled;
             }
         }
-
-        StopAllCoroutines();
-        StartCoroutine(HideAfter());
     }
 
-    private IEnumerator HideAfter()
-    {
-        yield return new WaitForSeconds(showDuration);
-        if (silhouette != null) silhouette.SetActive(false);
-    }
 }
