@@ -8,11 +8,13 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     [SerializeField] private float duration = 0.2f;      // 열리는 시간
 
     [Header("Audio (Optional)")]
-    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource sfxSource; // 재생기(힌지에 붙인 AudioSource 1개)
+    [SerializeField] private AudioClip sfxOpen;
+    [SerializeField] private AudioClip sfxClose;
 
     [Header("Lock")]
     [SerializeField] private bool startLocked = true;
-    [SerializeField] private AudioSource sfxLocked;
+    [SerializeField] private AudioClip sfxLocked;
 
     [Header("Start State")]
     [SerializeField] private bool startOpen = true; // 입구문에만 true로
@@ -52,7 +54,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     {
         if (isLocked)
         {
-            if (sfxLocked != null) sfxLocked.Play();
+            PlaySfx(sfxLocked);
             return;
         }
 
@@ -61,9 +63,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
         isOpen = !isOpen;
         StopAllCoroutines();
         StartCoroutine(RotateDoor(isOpen ? openLocalRot : closedLocalRot));
-
-        if (sfxSource != null)
-            sfxSource.Play();
+        PlaySfx(isOpen ? sfxOpen : sfxClose);
     }
 
     private IEnumerator RotateDoor(Quaternion target)
@@ -104,7 +104,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
         isOpen = true;
         StopAllCoroutines();
         StartCoroutine(RotateDoor(openLocalRot));
-        if (sfxSource != null) sfxSource.Play();
+        PlaySfx(sfxOpen);
     }
 
     public void Close()
@@ -113,7 +113,14 @@ public class DoorInteractable : MonoBehaviour, IInteractable
         isOpen = false;
         StopAllCoroutines();
         StartCoroutine(RotateDoor(closedLocalRot));
-        if (sfxSource != null) sfxSource.Play();
+        PlaySfx(sfxClose);
+    }
+
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null) return;
+        sfxSource.PlayOneShot(clip);
     }
 
 }

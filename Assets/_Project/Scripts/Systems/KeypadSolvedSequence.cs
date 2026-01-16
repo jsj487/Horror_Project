@@ -7,7 +7,8 @@ public class KeypadSolvedSequence : MonoBehaviour
     [SerializeField] private DoorInteractable entranceDoor; // 처음 들어온 Door_Hinge
     [SerializeField] private SilhouetteController silhouette;
     [SerializeField] private Transform silhouettePoint;
-    [SerializeField] private AudioSource stinger;           // 선택
+    [SerializeField] private AudioSource sfxSource;         // 선택(보통 카메라에 붙인 2D AudioSource)
+    [SerializeField] private AudioClip stingerClip;
 
     [Header("Timing")]
     [SerializeField] private float silhouetteDuration = 0.8f;
@@ -46,7 +47,7 @@ public class KeypadSolvedSequence : MonoBehaviour
 
         if (silhouette != null)
             silhouette.ShowAt(silhouettePoint, silhouetteDuration);
-        if (stinger != null) stinger.Play();
+        if (sfxSource != null && stingerClip != null) sfxSource.PlayOneShot(stingerClip);
 
         // 1) 먼저 시점 고정(문을 바라보게 만들기)
         float t = 0f;
