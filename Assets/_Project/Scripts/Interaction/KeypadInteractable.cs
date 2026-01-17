@@ -16,6 +16,9 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioSource sfxOk;
     [SerializeField] private AudioSource sfxFail;
+    [SerializeField] private AudioSource sfxKeyPress;
+    [SerializeField] private AudioSource sfxBackspace;
+    [SerializeField] private AudioSource sfxSubmit;
 
     [Header("Lock Control (Optional)")]
     [SerializeField] private MonoBehaviour lookScript; // FirstPersonLook 연결
@@ -76,7 +79,10 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             if (buffer.Length > 0)
+            {
                 buffer = buffer.Substring(0, buffer.Length - 1);
+                if (sfxBackspace != null) sfxBackspace.Play();
+            }
 
             RefreshUI();
             return;
@@ -85,6 +91,7 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
         // Enter 제출
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
+            if (sfxSubmit != null) sfxSubmit.Play();
             Submit();
             return;
         }
@@ -94,13 +101,18 @@ public class KeypadInteractable : MonoBehaviour, IInteractable
         var s = Input.inputString;
         if (!string.IsNullOrEmpty(s))
         {
+            bool appendedAny = false;
             foreach (char c in s)
             {
                 if (c < '0' || c > '9') continue;
                 if (buffer.Length >= codeLength) break;
 
                 buffer += c;
+                appendedAny = true;
             }
+
+            if (appendedAny && sfxKeyPress != null)
+                sfxKeyPress.Play();
 
             RefreshUI();
         }
