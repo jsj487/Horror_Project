@@ -11,6 +11,9 @@ public class PowerRestoreManager : MonoBehaviour
     [Header("On Completed (Optional)")]
     [SerializeField] private DoorInteractable[] doorsToUnlock;
     [SerializeField] private MonoBehaviour[] enableWhenRestored; // KeypadInteractable 등 활성화용
+    [Header("Audio (Optional)")]
+    [SerializeField] private AmbientMixerController ambientMixer;
+
 
     private int currentOnCount;
     private bool completed;
@@ -47,9 +50,8 @@ public class PowerRestoreManager : MonoBehaviour
     {
         completed = true;
 
-        // 전역 플래그 쓰고 있으면 같이 세팅
         if (EventFlags.Instance != null)
-            EventFlags.Instance.powerRestored = true; // EventFlags에 bool powerRestored 없으면 추가 필요
+            EventFlags.Instance.powerRestored = true;
 
         if (doorsToUnlock != null)
         {
@@ -66,6 +68,11 @@ public class PowerRestoreManager : MonoBehaviour
         if (objectiveManager != null)
             objectiveManager.SetStep(ObjectiveStep.Done);
 
+        // 전력 복구 순간에 앰비언트 크로스페이드
+        if (ambientMixer != null)
+            ambientMixer.SetPowerRestored(true);
+
         Debug.Log("[Power] Restored");
     }
+
 }
