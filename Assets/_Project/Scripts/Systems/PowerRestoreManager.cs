@@ -13,6 +13,7 @@ public class PowerRestoreManager : MonoBehaviour
     [SerializeField] private MonoBehaviour[] enableWhenRestored; // KeypadInteractable 등 활성화용
     [Header("Audio (Optional)")]
     [SerializeField] private AmbientMixerController ambientMixer;
+    [SerializeField] private AudioSnapshotDriver snapshotDriver;
 
 
     private int currentOnCount;
@@ -71,6 +72,9 @@ public class PowerRestoreManager : MonoBehaviour
         // 전력 복구 순간에 앰비언트 크로스페이드
         if (ambientMixer != null)
             ambientMixer.SetPowerRestored(true);
+
+        if (snapshotDriver != null)
+            snapshotDriver.PanicThenNormal(0.25f, 0.05f, 0.25f);
 
         Debug.Log("[Power] Restored");
     }
