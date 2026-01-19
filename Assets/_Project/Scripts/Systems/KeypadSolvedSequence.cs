@@ -10,6 +10,8 @@ public class KeypadSolvedSequence : MonoBehaviour
     [SerializeField] private AudioSource sfxSource;         // 선택(보통 카메라에 붙인 2D AudioSource)
     [SerializeField] private AudioClip stingerClip;
 
+    [SerializeField] private AudioSnapshotDriver snapshotDriver;
+
     [Header("Timing")]
     [SerializeField] private float silhouetteDuration = 0.8f;
     [SerializeField] private float closeDelay = 0.15f; // 실루엣 보이고 살짝 후 닫히게
@@ -36,6 +38,8 @@ public class KeypadSolvedSequence : MonoBehaviour
 
     public void Play()
     {
+        if (snapshotDriver != null) snapshotDriver.ToFocus(0.15f);
+
         if (played) return;
         played = true;
         StartCoroutine(CoPlay());
@@ -47,7 +51,11 @@ public class KeypadSolvedSequence : MonoBehaviour
 
         if (silhouette != null)
             silhouette.ShowAt(silhouettePoint, silhouetteDuration);
-        if (sfxSource != null && stingerClip != null) sfxSource.PlayOneShot(stingerClip);
+        if (sfxSource != null && stingerClip != null)
+        {
+            if (snapshotDriver != null) snapshotDriver.PanicThenNormal(0.35f, 0.05f, 0.35f);
+            sfxSource.PlayOneShot(stingerClip);
+        }
 
         // 1) 먼저 시점 고정(문을 바라보게 만들기)
         float t = 0f;
